@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <style>
+            :root {
+                font-family: sans-serif;
+                background-color: #f9fcfc;
+            }
+            ul {
+                padding: 0;
+                margin: 0;
+            }
+            li {
+                list-style: none;
+                padding: .4rem .8rem;
+                margin: 0 0 1rem 0;
+                background-color: #aee;
+                border: 1px solid #8dd;
+                border-radius: .4rem;
+            }
+            li button {
+                margin-left: .4rem;
+                padding: .2rem .4rem;
+                display: inline-block;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>A ver si</h1>
+        <ul id="tasks"></ul>
+        <input type="text" id="newTaskName"><input type="button" id="addButton" value="Añadir">
+
+        
+        <script>
+            const loadTasks = function() {
+                const storageKey = "tasks"
+                const savedTasksStr = localStorage.getItem(storageKey) ?? "[]"
+                const savedTasks = JSON.parse(savedTasksStr)
+
+                const taskNodes = savedTasks.map((task) => {
+                    const li = document.createElement("li")
+                    const deleteButton = document.createElement("button")
+                    deleteButton.setAttribute("data-task-name", task)
+                    deleteButton.textContent = "x"
+                    deleteButton.addEventListener("click", function(ev) {
+                        const taskName = this.getAttribute("data-task-name")
+                        deleteTask(taskName)
+                    })
+                    li.textContent = task
+                    li.appendChild(deleteButton)
+                    return li
+                })
+                document.querySelector("#tasks").innerHTML = ""
+                for (node of taskNodes) {
+                    document.querySelector("#tasks").appendChild(node)
+                }
+            }
+            const addTask = function() {
+                const newTaskName = document.querySelector("#newTaskName").value
+                
+                const storageKey = "tasks"
+                const savedTasksStr = localStorage.getItem(storageKey) ?? "[]"
+                const savedTasks = JSON.parse(savedTasksStr)
+
+                const allTasks = [...savedTasks, newTaskName]
+                localStorage.setItem(storageKey, JSON.stringify(allTasks))
+                loadTasks()
+                document.querySelector("#newTaskName").value = ""
+            }
+            const deleteTask = function(taskName) {
+                const storageKey = "tasks"
+                const savedTasksStr = localStorage.getItem(storageKey) ?? "[]"
+                const savedTasks = JSON.parse(savedTasksStr)
+
+                const allTasks = savedTasks.filter((t) => t != taskName)
+
+                localStorage.setItem(storageKey, JSON.stringify(allTasks))
+                loadTasks()
+            }
+            window.addEventListener("load", loadTasks)
+            document.querySelector("#addButton").addEventListener("click", addTask)
+                
+        </script>
+    </body>
+</html>
